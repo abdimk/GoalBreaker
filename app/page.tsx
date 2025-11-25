@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, Zap } from "lucide-react"; 
-import axios from "axios";
-
+import { Loader2, Zap } from "lucide-react";
 
 interface GoalBreakdownResult {
   sub_tasks: string[];
@@ -21,29 +20,26 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); 
+    setError("");
+    setResult(null);
 
     if (!goal.trim()) {
-      setError("Please enter a goal before breaking it down.");
+      setError("Please enter a goal.");
       return;
     }
 
     setLoading(true);
-    setResult(null);
 
     try {
      
-      const response = await axios.post<GoalBreakdownResult>(`${process.env.NEXT_PUBLIC_API_URL}/break-goal`,{ goal });
+      const response = await axios.post("/api", { goal });
 
-      
       setResult({
         originalGoal: goal,
         breakdown: response.data,
       });
-
-    } catch (err) {
-      console.error("API Call Error:", err);
-      setError("Failed to break down goal. The backend server might be unreachable or returned an error.");
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Backend returned an error.");
     } finally {
       setLoading(false);
     }
@@ -51,83 +47,66 @@ export default function Home() {
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 p-4">
-      {/* Container to center the content and limit its width */}
       <div className="w-full max-w-xl">
-        
-        {/* Header */}
+
         <header className="py-6 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 flex items-center justify-center">
-            <Zap className="w-6 h-6 mr-2 text-indigo-600" /> Smart Goal Breaker
+          <h1 className="text-4xl font-bold flex justify-center items-center gap-2">
+            <Zap className="w-6 h-6 text-indigo-600" /> Smart Goal Breaker
           </h1>
-          <p className="mt-2 text-lg text-gray-500">
-            Turn your vague ambitions into actionable, measurable steps.
-          </p>
         </header>
 
-        {/* Goal Input Form */}
-        <Card className="mb-8 shadow-lg">
+        <Card className="mb-8 shadow-md">
           <CardHeader>
             <CardTitle>Enter Your Goal</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="flex space-x-2">
+            <form onSubmit={handleSubmit} className="flex gap-2">
               <Input
-                type="text"
-                placeholder="e.g., Launch a successful SaaS product in 6 months"
+                placeholder="e.g., Build a SaaS app"
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
-                className="flex-grow"
-                disabled={loading}
               />
-              <Button type="submit" disabled={loading}>
+              <Button disabled={loading}>
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Processing...
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Processing
                   </>
                 ) : (
                   "Break It Down"
                 )}
               </Button>
             </form>
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
+            {error && <p className="text-red-500 mt-2">{error}</p>}
           </CardContent>
         </Card>
 
-        {/* --- Result Display --- */}
         {result && (
-          <Card className="shadow-lg border-l-4 border-indigo-500">
+          <Card className="shadow-md border-l-4 border-indigo-600">
             <CardHeader>
-              <CardTitle className="text-indigo-600">Action Plan for: "{result.originalGoal}"</CardTitle>
-              <CardDescription>
-                This goal has been broken down into sub-tasks for clarity.
-              </CardDescription>
+              <CardTitle className="text-indigo-600">
+                Action Plan: "{result.originalGoal}"
+              </CardTitle>
+              <CardDescription>Generated sub-tasks:</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="mb-4 p-3 bg-indigo-50 rounded-lg">
-                <p className="text-sm font-semibold text-gray-700">
-                  Complexity Score: 
-                  <span className={`ml-2 font-bold ${result.breakdown.complexity_score > 7 ? 'text-red-600' : result.breakdown.complexity_score > 4 ? 'text-yellow-600' : 'text-green-600'}`}>
-                    {result.breakdown.complexity_score}/10
-                  </span>
-                </p>
-                <p className="text-xs text-gray-600 mt-1">
-                  (Higher score means more sub-tasks and anticipated effort)
-                </p>
-              </div>
+              <p className="font-semibold mb-4">
+                Complexity Score: {result.breakdown.complexity_score}/10
+              </p>
 
-              <h3 className="text-lg font-semibold mb-3 border-b pb-1">Sub-Tasks</h3>
-              <ul className="space-y-3">
-                {result.breakdown.sub_tasks.map((task, index) => (
-                  <li key={index} className="flex items-start text-gray-700">
-                    <span className="text-indigo-500 font-bold mr-2">{index + 1}.</span>
-                    <p className="flex-1">{task}</p>
+              <ul className="space-y-2">
+                {result.breakdown.sub_tasks.map((task, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="font-bold text-indigo-600">{i + 1}.</span>
+                    <span>{task}</span>
                   </li>
                 ))}
               </ul>
             </CardContent>
           </Card>
         )}
+
       </div>
     </div>
   );
