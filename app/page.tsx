@@ -29,11 +29,12 @@ export default function Home() {
     }
 
     setLoading(true);
-    setResult(null); // Clear previous results
+    setResult(null);
 
     try {
      
-      const response = await axios.post<GoalBreakdownResult>("http://localhost:8000/break-goal", { goal });
+      const response = await axios.post<GoalBreakdownResult>(`${process.env.NEXT_PUBLIC_API_URL}/break-goal`,{ goal });
+
       
       setResult({
         originalGoal: goal,
