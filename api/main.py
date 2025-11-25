@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 from models.database import engine, Base
 from routes.router import router
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
@@ -13,16 +12,19 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://goal-breaker-one.vercel.app","https://goal-breaker-one.vercel.app/"],
+    allow_origins=["https://goal-breaker-one.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(router)
+
+@app.get("/")
+async def index():
+    return {"Server is working"}
 
 if __name__ == "__main__":
     import uvicorn
