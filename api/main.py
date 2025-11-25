@@ -16,7 +16,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000","https://goal-breaker-one.vercel.app/"],
+    allow_origins=["https://goal-breaker-one.vercel.app","https://goal-breaker-one.vercel.app/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
