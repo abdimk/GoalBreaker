@@ -3,16 +3,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Loader2, Zap } from "lucide-react"; 
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Loader2, Zap } from "lucide-react"; // Importing an icon for the button spinner and a title icon
 import axios from "axios";
 
+// Define the shape of the data returned by the backend
 interface GoalBreakdownResult {
   sub_tasks: string[];
   complexity_score: number;
@@ -26,7 +21,7 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError(""); // Clear previous errors
 
     if (!goal.trim()) {
       setError("Please enter a goal before breaking it down.");
@@ -34,23 +29,20 @@ export default function Home() {
     }
 
     setLoading(true);
-    setResult(null);
+    setResult(null); // Clear previous results
 
     try {
-   
-      const response = await axios.post<GoalBreakdownResult>("/api/break-goal", { goal });
-
+      // **NOTE:** Ensure your backend server is running at this address.
+      const response = await axios.post<GoalBreakdownResult>("http://localhost:8000/break-goal", { goal });
+      
       setResult({
         originalGoal: goal,
         breakdown: response.data,
       });
-    } catch (err: unknown) {
+
+    } catch (err) {
       console.error("API Call Error:", err);
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.error || "Backend returned an error.");
-      } else {
-        setError("Unexpected error occurred.");
-      }
+      setError("Failed to break down goal. The backend server might be unreachable or returned an error.");
     } finally {
       setLoading(false);
     }
@@ -58,19 +50,20 @@ export default function Home() {
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 p-4">
+      {/* Container to center the content and limit its width */}
       <div className="w-full max-w-xl">
-       
+        
+        {/* Header */}
         <header className="py-6 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 flex items-center justify-center">
-            <Zap className="w-6 h-6 mr-2 text-indigo-600" />
-            Smart Goal Breaker
+            <Zap className="w-6 h-6 mr-2 text-indigo-600" /> Smart Goal Breaker
           </h1>
           <p className="mt-2 text-lg text-gray-500">
             Turn your vague ambitions into actionable, measurable steps.
           </p>
         </header>
 
-       
+        {/* Goal Input Form */}
         <Card className="mb-8 shadow-lg">
           <CardHeader>
             <CardTitle>Enter Your Goal</CardTitle>
@@ -100,13 +93,11 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        
+        {/* --- Result Display --- */}
         {result && (
           <Card className="shadow-lg border-l-4 border-indigo-500">
             <CardHeader>
-              <CardTitle className="text-indigo-600">
-                Action Plan for: &quot;{result.originalGoal}&quot;
-              </CardTitle>
+              <CardTitle className="text-indigo-600">Action Plan for: "{result.originalGoal}"</CardTitle>
               <CardDescription>
                 This goal has been broken down into sub-tasks for clarity.
               </CardDescription>
@@ -115,15 +106,7 @@ export default function Home() {
               <div className="mb-4 p-3 bg-indigo-50 rounded-lg">
                 <p className="text-sm font-semibold text-gray-700">
                   Complexity Score: 
-                  <span
-                    className={`ml-2 font-bold ${
-                      result.breakdown.complexity_score > 7
-                        ? "text-red-600"
-                        : result.breakdown.complexity_score > 4
-                        ? "text-yellow-600"
-                        : "text-green-600"
-                    }`}
-                  >
+                  <span className={`ml-2 font-bold ${result.breakdown.complexity_score > 7 ? 'text-red-600' : result.breakdown.complexity_score > 4 ? 'text-yellow-600' : 'text-green-600'}`}>
                     {result.breakdown.complexity_score}/10
                   </span>
                 </p>

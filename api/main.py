@@ -1,14 +1,19 @@
+# main.py
+
 import sys
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+
+project_root = Path(__file__).resolve().parent
+
+sys.path.append(str(project_root))
+
 from models.database import engine, Base
 from routes.router import router
 
-project_root = Path(__file__).resolve().parent
-sys.path.append(str(project_root))
 
 origins = [
     "http://localhost:3000",
