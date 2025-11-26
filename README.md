@@ -1,4 +1,4 @@
-# 🎯 Goal Deconstructor
+# 🎯 Smart Goal Breaker
 
 A **Next.js (App Router)** frontend application that transforms complex goals into clear, actionable sub-tasks using an LLM-powered backend service. The app communicates securely with the backend through a Next.js API proxy route.
 
@@ -8,7 +8,8 @@ A **Next.js (App Router)** frontend application that transforms complex goals in
 
 - **Frontend:** Next.js, TypeScript, React Hooks  
 - **Styling:** Tailwind CSS  
-- **Networking:** Axios (Client), Next.js API Routes (Proxy)
+- **Backend:** FastApi
+- **DataBase:** NeonDB(Postgres hosted instance)
 
 ---
 
