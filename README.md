@@ -31,8 +31,11 @@ yarn install
 
 ```bash
 # .env.local
-BACKEND_API_URL=http://localhost:8000
-USE_MOCK_AI=false
+# BACKEND_API_URL=http://localhost:8000
+BACKEND_API_URL=
+
+NEON_URL= 
+GEMINI_API_KEY=
 ```
 
 
