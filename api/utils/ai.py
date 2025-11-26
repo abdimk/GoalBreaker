@@ -16,7 +16,7 @@ if GEMINI_API_KEY:
 API_TIMEOUT_SECONDS = 30
 
 def mock_break_down_goal(goal_text: str) -> dict:
-    print(f"⚠️ MOCK MODE ACTIVE: Returning static goal breakdown for '{goal_text}'.")
+    print(f"MOCK MODE ACTIVE: Returning static goal breakdown for '{goal_text}'.")
     if "startup" in goal_text.lower():
         tasks = ["Validate market need", "Develop MVP", "Secure funding", "Launch early marketing", "Scale operations"]
     elif "book" in goal_text.lower() or "read" in goal_text.lower():
@@ -32,13 +32,29 @@ def break_down_goal(goal_text: str) -> dict:
     if not GEMINI_API_KEY:
         raise ValueError("GEMINI_API_KEY not found in .env")
     prompt = f"""
-Return ONLY valid JSON.
-Goal: "{goal_text}"
-JSON format:
+You must respond with valid JSON only.
+
+Structure:
 {{
-  "sub_tasks": ["task1", "task2", "task3", "task4", "task5"],
+  "sub_tasks": [
+    "task 1",
+    "task 2",
+    "task 3",
+    "task 4",
+    "task 5"
+  ],
   "complexity_score": number
 }}
+
+Rules:
+- Exactly 5 subtasks.
+- No explanations.
+- No markdown.
+- No text outside the JSON.
+- sub_tasks must be a list of 5 strings.
+- complexity_score must be an integer from 1 to 10.
+
+Goal: "{goal_text}"
 """
     try:
         model = genai.GenerativeModel("gemini-2.0-flash")
@@ -52,9 +68,9 @@ JSON format:
         result = json.loads(raw_clean)
         return result
     except json.JSONDecodeError:
-        print("❌ JSON parsing failed.")
+        print("JSON parsing failed.")
         print("Received:", raw)
         return {"sub_tasks": ["Invalid response format"], "complexity_score": 10}
     except Exception as e:
-        print(f"❌ Gemini API error: {e}")
+        print(f"Gemini API error: {e}")
         return {"sub_tasks": ["AI request failed"], "complexity_score": 10}
