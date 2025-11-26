@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Loader2, Zap } from "lucide-react"; // Importing an icon for the button spinner and a title icon
+import { Loader2, Zap } from "lucide-react"; 
 import axios from "axios";
 
-// Define the shape of the data returned by the backend
+
 interface GoalBreakdownResult {
   sub_tasks: string[];
   complexity_score: number;
@@ -21,7 +21,7 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
     if (!goal.trim()) {
       setError("Please enter a goal before breaking it down.");
@@ -29,11 +29,11 @@ export default function Home() {
     }
 
     setLoading(true);
-    setResult(null); // Clear previous results
+    setResult(null);
 
     try {
-      // **NOTE:** Ensure your backend server is running at this address.
-      const response = await axios.post<GoalBreakdownResult>("http://localhost:8000/break-goal", { goal });
+    
+      const response = await axios.post<GoalBreakdownResult>("/api", { goal });
       
       setResult({
         originalGoal: goal,
@@ -42,7 +42,8 @@ export default function Home() {
 
     } catch (err) {
       console.error("API Call Error:", err);
-      setError("Failed to break down goal. The backend server might be unreachable or returned an error.");
+      
+      setError("Failed to break down goal. Check Vercel logs for backend connection details.");
     } finally {
       setLoading(false);
     }
@@ -50,10 +51,9 @@ export default function Home() {
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-50 p-4">
-      {/* Container to center the content and limit its width */}
+  
       <div className="w-full max-w-xl">
-        
-        {/* Header */}
+  
         <header className="py-6 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 flex items-center justify-center">
             <Zap className="w-6 h-6 mr-2 text-indigo-600" /> Smart Goal Breaker
@@ -63,7 +63,7 @@ export default function Home() {
           </p>
         </header>
 
-        {/* Goal Input Form */}
+      
         <Card className="mb-8 shadow-lg">
           <CardHeader>
             <CardTitle>Enter Your Goal</CardTitle>
@@ -93,7 +93,7 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        {/* --- Result Display --- */}
+
         {result && (
           <Card className="shadow-lg border-l-4 border-indigo-500">
             <CardHeader>
