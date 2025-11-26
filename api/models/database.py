@@ -16,19 +16,20 @@ cleanParams = {k: v for k, v in queryParams.items() if k.lower() not in ['sslmod
 newQuery = urlencode(cleanParams, doseq=True)
 
 ASYNC_DB_URL = urlunparse((
-    'postgresql+asyncpg', 
-    parsed.netloc, 
-    parsed.path, 
-    parsed.params, 
-    newQuery, 
+    'postgresql+asyncpg',
+    parsed.netloc,
+    parsed.path,
+    parsed.params,
+    newQuery,
     parsed.fragment
 ))
 
-
 engine = create_async_engine(
     ASYNC_DB_URL,
-    echo=True, 
-    connect_args={"ssl": True} 
+    echo=True,
+    connect_args={"ssl": True},
+    pool_pre_ping=True,
+    pool_recycle=180,  
 )
 
 AsyncSessionLocal = sessionmaker(
